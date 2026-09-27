@@ -1,0 +1,14 @@
+{
+  "name": "heimdell-forms-gateway",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Private form-processing service for Heimdell-hosted static websites",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test"
+  }
+}
