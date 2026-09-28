@@ -48,3 +48,25 @@ test('form posts from unapproved origins are rejected before delivery', async ()
   });
   assert.equal(response.status, 403);
 });
+
+
+test('Heimdell contact route is registered', async () => {
+  const response = await fetch(`http://127.0.0.1:${port}/heimdell/contact`);
+  assert.equal(response.status, 405);
+});
+
+test('Heimdell form rejects unapproved origins before delivery', async () => {
+  const response = await fetch(`http://127.0.0.1:${port}/heimdell/contact`, {
+    method: 'POST',
+    headers: {
+      Origin: 'https://attacker.example',
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: new URLSearchParams({
+      'form-name': 'contact',
+      name: 'Test User',
+    }),
+    redirect: 'manual',
+  });
+  assert.equal(response.status, 403);
+});
