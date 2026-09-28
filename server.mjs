@@ -7,13 +7,20 @@ const MAX_REQUESTS_PER_WINDOW = 8;
 
 const allowedOrigins = new Set(
   (process.env.ALLOWED_ORIGINS ||
-    'https://greenfixexterior-care.co.uk,https://www.greenfixexterior-care.co.uk,https://remoteability.org.uk,https://www.remoteability.org.uk,https://heimdelltechai2035.github.io')
+    'https://greenfixexterior-care.co.uk,https://www.greenfixexterior-care.co.uk,https://remoteability.org.uk,https://www.remoteability.org.uk,https://heimdell-tech-ai.co.uk,https://www.heimdell-tech-ai.co.uk,https://heimdelltechai2035.github.io')
     .split(',')
     .map((value) => value.trim())
     .filter(Boolean),
 );
 
 const routes = new Map([
+  ['/heimdell/contact', {
+    formName: 'contact',
+    subject: 'New Heimdell Tech AI enquiry',
+    toEnv: 'HEIMDELL_FORM_TO',
+    defaultTo: 'andrew@heimdell-tech-ai.co.uk',
+    successUrl: 'https://heimdell-tech-ai.co.uk/get-started.html?sent=1',
+  }],
   ['/greenfix/quote-request', {
     formName: 'quote-request',
     subject: 'New Greenfix quote request',
