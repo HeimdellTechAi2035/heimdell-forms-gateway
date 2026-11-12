@@ -70,3 +70,24 @@ test('Heimdell form rejects unapproved origins before delivery', async () => {
   });
   assert.equal(response.status, 403);
 });
+
+test('Heimdell Technology MOT enquiry route is registered', async () => {
+  const response = await fetch(`http://127.0.0.1:${port}/heimdell/technology-mot`);
+  assert.equal(response.status, 405);
+});
+
+test('Technology MOT enquiry route rejects unapproved origins', async () => {
+  const response = await fetch(`http://127.0.0.1:${port}/heimdell/technology-mot`, {
+    method: 'POST',
+    headers: {
+      Origin: 'https://attacker.example',
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: new URLSearchParams({
+      'form-name': 'technology-mot',
+      company: 'Test Company',
+    }),
+    redirect: 'manual',
+  });
+  assert.equal(response.status, 403);
+});
