@@ -64,7 +64,10 @@ jobs:
           install -d -m 700 ~/.ssh
           printf '%s\n' "$VPS_SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan -H "$VPS_HOST" >> ~/.ssh/known_hosts
+          # Probe only the server's Ed25519 host key. The default keyscan probes
+          # multiple algorithms/connections and can trigger Fail2ban's SSH jail.
+          ssh-keyscan -T 10 -t ed25519 -H "$VPS_HOST" >> ~/.ssh/known_hosts
+          test -s ~/.ssh/known_hosts
           chmod 600 ~/.ssh/known_hosts
 
       - name: Prepare encrypted runtime environment
@@ -87,6 +90,8 @@ jobs:
           set -Eeuo pipefail
           release="/var/www/forms-gateway/releases/${GITHUB_SHA}-${GITHUB_RUN_ATTEMPT}"
 
+          # Fail fast with a clear SSH authentication check before uploading releases.
+          ssh -o BatchMode=yes -o ConnectTimeout=10 "$VPS_USER@$VPS_HOST" "true"
           ssh "$VPS_USER@$VPS_HOST" "mkdir -p '$release' /var/www/forms-gateway/shared"
           tar -czf - server.mjs package.json |
             ssh "$VPS_USER@$VPS_HOST" "tar -xzf - -C '$release'"
