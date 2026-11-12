@@ -21,6 +21,13 @@ const routes = new Map([
     defaultTo: 'andrew@heimdell-tech-ai.co.uk',
     successUrl: 'https://heimdell-tech-ai.co.uk/get-started.html?sent=1',
   }],
+  ['/heimdell/technology-mot', {
+    formName: 'technology-mot',
+    subject: 'New Heimdell Business Technology MOT booking request',
+    toEnv: 'HEIMDELL_FORM_TO',
+    defaultTo: 'andrew@heimdell-tech-ai.co.uk',
+    successUrl: 'https://heimdell-tech-ai.co.uk/business-technology-mot.html?sent=1#booking',
+  }],
   ['/greenfix/quote-request', {
     formName: 'quote-request',
     subject: 'New Greenfix quote request',
