@@ -37,6 +37,7 @@ jobs:
     environment: production
     env:
       VPS_HOST: ${{ secrets.VPS_HOST }}
+      VPS_SSH_KNOWN_HOSTS: ${{ vars.VPS_SSH_KNOWN_HOSTS }}
       VPS_USER: ${{ secrets.VPS_USER }}
       VPS_SSH_PRIVATE_KEY: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
       RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
@@ -64,11 +65,12 @@ jobs:
           install -d -m 700 ~/.ssh
           printf '%s\n' "$VPS_SSH_PRIVATE_KEY" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
-          # Probe only the server's Ed25519 host key. The default keyscan probes
-          # multiple algorithms/connections and can trigger Fail2ban's SSH jail.
-          ssh-keyscan -T 10 -t ed25519 -H "$VPS_HOST" >> ~/.ssh/known_hosts
-          test -s ~/.ssh/known_hosts
+          test -n "$VPS_SSH_KNOWN_HOSTS" || { echo '::error::Set VPS_SSH_KNOWN_HOSTS using the verified VPS console key'; exit 1; }
+          printf '%s\n' "$VPS_SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
           chmod 600 ~/.ssh/known_hosts
+          ssh-keygen -F "$VPS_HOST" -f ~/.ssh/known_hosts >/dev/null
+          printf '%s\n' 'Host *' '  StrictHostKeyChecking yes' > ~/.ssh/config
+          chmod 600 ~/.ssh/config
 
       - name: Prepare encrypted runtime environment
         shell: bash
