@@ -1,4 +1,5 @@
 import http from 'node:http';
+import { isIP } from 'node:net';
 
 const PORT = Number(process.env.PORT || 3100);
 const MAX_BODY_BYTES = 64 * 1024;
@@ -97,8 +98,13 @@ function sendErrorPage(res, statusCode, message) {
 }
 
 function clientAddress(req) {
-  const forwarded = String(req.headers['x-forwarded-for'] || '').split(',')[0].trim();
-  return forwarded || req.socket.remoteAddress || 'unknown';
+  const peer = req.socket.remoteAddress;
+  if (peer !== '127.0.0.1') return peer || 'unknown';
+
+  // Nginx is the only proxy connected to this loopback listener. Its
+  // appended socket peer is the final entry, following any inbound list.
+  const client = String(req.headers['x-forwarded-for'] || '').split(',').at(-1).trim();
+  return isIP(client) ? client : peer;
 }
 
 function isRateLimited(address) {
